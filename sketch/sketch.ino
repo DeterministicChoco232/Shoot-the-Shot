@@ -36,7 +36,9 @@ void setup() {
   Serial.begin(115200);
 
   // Configure pins
-  controller.configureL298N(9,7,6,10,5,4)
+  controller.configureL298N(
+    9,7,6,10,5,4
+  );
 
   // Set motor PWM for a medium-weight robot
   controller.setMotorMinPWM(90);
