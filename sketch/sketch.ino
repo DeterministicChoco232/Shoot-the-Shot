@@ -37,7 +37,8 @@ void setup() {
 
   // Configure pins
   controller.configureL298N(
-    9,7,6,10,5,4
+    9,7,6, // ENA, IN1, IN2
+    10,5,4 // ENB, IN3, IN4
   );
 
   // Set motor PWM for a medium-weight robot
