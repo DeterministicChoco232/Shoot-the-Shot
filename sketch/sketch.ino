@@ -14,6 +14,14 @@ void armBrake() {
   analogWrite(en, 0);
 }
 
+void armRelease() {
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+  analogWrite(en, 0);
+  delay(500);
+  armBrake();
+}
+
 // in1 HIGH, in2 LOW
 void enableForward() {
   armBrake();
@@ -64,6 +72,7 @@ void setup() {
     // Add buttons
     controller.registerButton("Forward", pulseForward);
     controller.registerButton("Backward", pulseBackward);
+    controller.registerButton("Release", armRelease);
   }
 }
 
