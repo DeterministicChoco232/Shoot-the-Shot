@@ -24,6 +24,7 @@ void enableForward() {
 
 // in1 LOW, in2 HIGH
 void enableBackward() {
+  armBrake();
   digitalWrite(in1, LOW);
   digitalWrite(in2, HIGH);
   analogWrite(en, arm_pwm);
