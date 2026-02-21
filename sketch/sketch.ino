@@ -1,64 +1,69 @@
 #include "Controller.h"
 
-// IDK how any of this works
+// Arm settings
+#define in1 0
+#define in2 0
+#define en 0  // pwm
+#define arm_pwm 30
+#define pulse_delay 500
+bool using_arm = false;
 
-// TODO: placeholder
-int armDirectionPin = 12;
-int armBrakePin = 9;
-int armpwmPin = 3;
-
-void onPressTest() {
-  Serial.println("Button pressed!");
+void armBrake() {
+  digitalWrite(in1, HIGH);
+  digitalWrite(in2, HIGH);
+  analogWrite(en, 0);
 }
 
-// Move a bit in the HIGH direction
-void powerArmHigh() {
-  digitalWrite(armDirectionPin, HIGH);
-  digitalWrite(armBrakePin, LOW);
-  analogWrite(armpwmPin, 30);
-  delay(500); // TODO: configure this
-  digitalWrite(armBrakePin, HIGH);
-  analogWrite(armpwmPin, 0);
+// in1 HIGH, in2 LOW
+void enableForward() {
+  armBrake();
+  digitalWrite(in1, HIGH);
+  digitalWrite(in2, LOW);
+  analogWrite(en, arm_pwm);
 }
 
-// Move a bit in the LOW direction
-void powerArmLow() {
-  digitalWrite(armDirectionPin, LOW);
-  digitalWrite(armBrakePin, LOW);
-  analogWrite(armpwmPin, 30);
-  delay(500); // TODO: configure this
-  digitalWrite(armBrakePin, HIGH);
-  analogWrite(armpwmPin, 0);
+// in1 LOW, in2 HIGH
+void enableBackward() {
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
+  analogWrite(en, arm_pwm);
+}
+
+void pulseForward() {
+  enableForward();
+  delay(pulse_delay);
+  armBrake();
+}
+
+void pulseBackward() {
+  enableBackward();
+  delay(pulse_delay);
+  armBrake();
 }
 
 Controller controller("NoahsArch", "SurvivedTheFlood");
 void setup() {
+  // Movement control
   Serial.begin(115200);
-
-  // Configure pins
   controller.configureL298N(
     9,7,6, // ENA, IN1, IN2
     10,5,4 // ENB, IN3, IN4
   );
-
-  // Set motor PWM for a medium-weight robot
   controller.setMotorMinPWM(90);
-
-  // Stops after no command received
   controller.setFailsafeTimeoutMs(1200);
-
-  // Enable status LED
   controller.enableStatusLED(LED_BUILTIN);
-
-  // Add buttons
-  // controller.registerButton("Button!", onPressTest);
-  // controller.registerButton("Arm LOW", powerArmLow);
-  // controller.registerButton("Arm HIGH", powerArmHigh)
-;
-  // Set arm pin mode
-  // pinMode(armDirectionPin, OUTPUT);
-
   controller.beginAP(true);   // true = enable debug
+  
+  // Arm control
+  if (using_arm) {
+    pinMode(in1, OUTPUT);
+    pinMode(in2, OUTPUT);
+    pinMode(en, OUTPUT);
+
+    // Add buttons
+    controller.registerButton("Forward", pulseForward);
+    controller.registerButton("Backward", pulseBackward);
+  }
 }
 
 void loop() {
