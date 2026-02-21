@@ -1,4 +1,5 @@
 #include "Controller.h"
+#include <vector>
 
 // Arm settings
 #define in1 0
@@ -7,6 +8,17 @@
 #define arm_pwm 30
 #define pulse_delay 500
 bool using_arm = false;
+std::vector<long double> w = {};
+
+long double distToTime(long double d) {
+  long double ret = 0;
+  long double dPow = 1;
+  for(size_t i=0; i<w.size(); ++i) {
+    ret += w[i] * dPow;
+    dPow*=d;
+  }
+  return ret;
+}
 
 void armBrake() {
   digitalWrite(in1, HIGH);

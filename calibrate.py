@@ -21,6 +21,7 @@ for M in [2, 3, 4, 5]:
 
     # Solve normal equations: (X^T X) w = X^T t
     w = np.linalg.solve(X.T @ X, X.T @ t)
+    print(w);
 
     print(f"Least squares (M={M}): {least_squares(x, t, w):.6f}")
 
