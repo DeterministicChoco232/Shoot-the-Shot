@@ -1,12 +1,12 @@
 #include "Controller.h"
 
 // Arm settings
-#define in1 0
-#define in2 0
-#define en 0  // pwm
+#define in1 3
+#define in2 2
+#define en 11  // pwm
 #define arm_pwm 30
 #define pulse_delay 500
-bool using_arm = false;
+bool using_arm = true;
 
 void armBrake() {
   digitalWrite(in1, HIGH);
