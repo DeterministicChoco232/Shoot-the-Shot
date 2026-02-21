@@ -5,18 +5,18 @@
 #define in1 3
 #define in2 2
 #define en 11  // pwm
-unsigned int arm_pwm 255
-#define pulse_delay 500
+unsigned int arm_pwm = 210;
+unsigned int pulse_delay = 300;
 bool using_arm = true;
 std::vector<long double> w = {};
 
-void increase_pwm() {
-  arm_pwm += 10;
-}
+void increase_pwm() {arm_pwm += 10;}
 
-void decrease_pwm() {
-  arm_pwm -= 10;
-}
+void decrease_pwm() {arm_pwm -= 10;}
+
+void increase_delay() {pulse_delay+=25;}
+
+void decrease_delay() {pulse_delay-=25;}
 
 // long double distToTime(long double d) {
 //   long double ret = 0;
@@ -95,6 +95,8 @@ void setup() {
     controller.registerButton("Release", armRelease);
     controller.registerButton("PWM +10", increase_pwm);
     controller.registerButton("PWM -10", decrease_pwm);
+    controller.registerButton("Delay +25", increase_delay);
+    controller.registerButton("Delay -25", decrease_delay);
   }
 }
 
