@@ -5,7 +5,7 @@
 #define in1 3
 #define in2 2
 #define en 11  // pwm
-#define arm_pwm 30
+#define arm_pwm 100
 #define pulse_delay 500
 bool using_arm = true;
 std::vector<long double> w = {};
