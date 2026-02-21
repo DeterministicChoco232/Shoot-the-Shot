@@ -36,36 +36,28 @@ void setup() {
   Serial.begin(115200);
 
   // Configure pins
-  //controller.configureL298N(9,7,6,10,5,4);
-  pinMode(6, OUTPUT);
-  pinMode(7, OUTPUT);
-  pinMode(9, OUTPUT);
+  controller.configureL298N(9,7,6,10,5,4)
 
   // Set motor PWM for a medium-weight robot
-  //controller.setMotorMinPWM(90);
+  controller.setMotorMinPWM(90);
 
   // Stops after no command received
-  //controller.setFailsafeTimeoutMs(1200);
+  controller.setFailsafeTimeoutMs(1200);
 
   // Enable status LED
-  //controller.enableStatusLED(LED_BUILTIN);
+  controller.enableStatusLED(LED_BUILTIN);
 
   // Add buttons
-  //controller.registerButton("Button!", onPressTest);
-  //controller.registerButton("Arm LOW", powerArmLow);
-  //controller.registerButton("Arm HIGH", powerArmHigh)
+  // controller.registerButton("Button!", onPressTest);
+  // controller.registerButton("Arm LOW", powerArmLow);
+  // controller.registerButton("Arm HIGH", powerArmHigh)
 ;
   // Set arm pin mode
-  //pinMode(armDirectionPin, OUTPUT);
+  // pinMode(armDirectionPin, OUTPUT);
 
-  //controller.beginAP(true);   // true = enable debug
+  controller.beginAP(true);   // true = enable debug
 }
 
 void loop() {
-  analogWrite(9, 255);
-  digitalWrite(7, HIGH);
-  digitalWrite(6, LOW);
-  delay(1000);
-  //controller.update();
-  //Serial.println("hello???!");
+  controller.update();
 }
