@@ -28,7 +28,6 @@ void decrease_delay() {pulse_delay-=25;}
 //   return ret;
 // }
 
-
 void armBrake() {
   digitalWrite(in1, HIGH);
   digitalWrite(in2, HIGH);
@@ -58,7 +57,6 @@ void enableBackward() {
   digitalWrite(in2, HIGH);
   analogWrite(en, arm_pwm);
 }
-
 
 void armReset() {
   unsigned int old = arm_pwm;
@@ -92,7 +90,7 @@ void setup() {
   controller.setFailsafeTimeoutMs(1200);
   controller.enableStatusLED(LED_BUILTIN);
   controller.beginAP(true);   // true = enable debug
-  
+
   // Arm control
   if (using_arm) {
     pinMode(in1, OUTPUT);
@@ -111,5 +109,7 @@ void setup() {
 }
 
 void loop() {
+  arm_pwm = controller.pwmValue;
+  pulse_delay = controller.timeDelayMs;
   controller.update();
 }
