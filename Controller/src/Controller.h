@@ -10,8 +10,8 @@
 
 class Controller {
 public:
-	int timeDelayMs = 300;
-	int pwmValue = 210;
+	int timeDelayMs = 500;
+	int pwmValue = 255;
     Controller(const char* ssid, const char* password);
 
     // Start AP + HTTP server (optional debug flag for prints)

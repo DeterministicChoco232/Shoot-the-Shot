@@ -60,10 +60,13 @@ void enableBackward() {
 
 void armReset() {
   unsigned int old = arm_pwm;
-  arm_pwm = 30;
+  arm_pwm = 80;
   enableForward();
   delay(1250);
+  enableBackward();
+  delay(1250);
   armBrake();
+  arm_pwm = old;
 }
 
 void pulseForward() {
@@ -76,6 +79,8 @@ void pulseBackward() {
   enableBackward();
   delay(pulse_delay);
   armBrake();
+  delay(200);
+  armReset();
 }
 
 Controller controller("NoahsArch", "SurvivedTheFlood");

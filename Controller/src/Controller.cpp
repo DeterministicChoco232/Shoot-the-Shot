@@ -569,17 +569,17 @@ page += "</div>";
 page += "<div class='row' id='timeRow'>";
 page += "  <div class='timeHeader'>";
 page += "    <div class='timeLabel'>Time Delay</div>";
-page += "    <div class='timeValue'><span id='timeval'>300</span>ms</div>";
+page += "    <div class='timeValue'><span id='timeval'>500</span>ms</div>";
 page += "  </div>";
-page += "  <input id='time' class='thr' type='range' min='100' max='600' value='300' step='1'/>";
+page += "  <input id='time' class='thr' type='range' min='100' max='600' value='500' step='1'/>";
 page += "</div>";
 
 page += "<div class='row' id='pwmRow'>";
 page += "  <div class='pwmHeader'>";
 page += "    <div class='pwmLabel'>PWM</div>";
-page += "    <div class='pwmValue'><span id='pwmval'>210</span></div>";
+page += "    <div class='pwmValue'><span id='pwmval'>255</span></div>";
 page += "  </div>";
-page += "  <input id='pwm' class='thr' type='range' min='1' max='255' value='210' step='1'/>";
+page += "  <input id='pwm' class='thr' type='range' min='1' max='255' value='255' step='1'/>";
 page += "</div>";
 
     // --- JS (STOP priority even if a request is in-flight) + HEARTBEAT resend ---
@@ -701,8 +701,8 @@ page += "</div>";
     page += "const pwmSlider=document.getElementById('pwm');";
     page += "const pwmval=document.getElementById('pwmval');";
 
-    page += "let timeDelay=300;";
-    page += "let pwmValue=210;";
+    page += "let timeDelay=500;";
+    page += "let pwmValue=255;";
 
     page += "timeSlider.addEventListener('input',()=>{";
     page += "  timeDelay=parseInt(timeSlider.value,10)||300;";
