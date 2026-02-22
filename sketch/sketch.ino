@@ -23,7 +23,7 @@ std::vector<long double> w = {};
 
 void armBrake() {
   digitalWrite(in1, HIGH);
-  digitalWrite(in2, HIGH);aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  digitalWrite(in2, HIGH);
   analogWrite(en, 0);
 }
 
@@ -53,7 +53,7 @@ void enableBackward() {
 
 void armReset() {
   unsigned int old = arm_pwm;
-  arm_pwm = 80;
+  arm_pwm = 40;
   enableForward();
   delay(700);
   armBrake();
