@@ -101,6 +101,24 @@ void nudgeFront() {
 void nudgeBack() {
   controller.nudgeBack(nudgeThr, nudgeDur);
 }
+void nudgeLeft5() {
+  for(int i=0; i<5; ++i)
+  controller.nudgeLeft(nudgeThr, nudgeDur);
+}
+
+void nudgeRight5() {
+  for(int i=0; i<5; ++i)
+  controller.nudgeRight(nudgeThr, nudgeDur);
+}
+void nudgeFront5() {
+  for(int i=0; i<5; ++i)
+  controller.nudgeFront(nudgeThr, nudgeDur);
+}
+
+void nudgeBack5() {
+  for(int i=0; i<5; ++i)
+  controller.nudgeBack(nudgeThr, nudgeDur);
+}
 void setup() {
   // Movement control
   Serial.begin(115200);
@@ -130,6 +148,10 @@ void setup() {
     controller.registerButton("Nudge Right", nudgeRight);
     controller.registerButton("Nudge Front", nudgeFront);
     controller.registerButton("Nudge Back", nudgeBack);
+    controller.registerButton("Nudge Left x5", nudgeLeft5);
+    controller.registerButton("Nudge Right x5", nudgeRight5);
+    controller.registerButton("Nudge Front x5", nudgeFront5);
+    controller.registerButton("Nudge Back x5", nudgeBack5);
   
 }
 
