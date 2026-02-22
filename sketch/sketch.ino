@@ -101,22 +101,22 @@ void nudgeFront() {
 void nudgeBack() {
   controller.nudgeBack(nudgeThr, nudgeDur);
 }
-void nudgeLeft5() {
-  for(int i=0; i<5; ++i)
+void nudgeLeft3() {
+  for(int i=0; i<3; ++i)
   controller.nudgeLeft(nudgeThr, nudgeDur);
 }
 
-void nudgeRight5() {
-  for(int i=0; i<5; ++i)
+void nudgeRight3() {
+  for(int i=0; i<3; ++i)
   controller.nudgeRight(nudgeThr, nudgeDur);
 }
-void nudgeFront5() {
-  for(int i=0; i<5; ++i)
+void nudgeFront3() {
+  for(int i=0; i<3; ++i)
   controller.nudgeFront(nudgeThr, nudgeDur);
 }
 
-void nudgeBack5() {
-  for(int i=0; i<5; ++i)
+void nudgeBack3() {
+  for(int i=0; i<3; ++i)
   controller.nudgeBack(nudgeThr, nudgeDur);
 }
 void setup() {
@@ -148,10 +148,10 @@ void setup() {
     controller.registerButton("Nudge Right", nudgeRight);
     controller.registerButton("Nudge Front", nudgeFront);
     controller.registerButton("Nudge Back", nudgeBack);
-    controller.registerButton("Nudge Left x5", nudgeLeft5);
-    controller.registerButton("Nudge Right x5", nudgeRight5);
-    controller.registerButton("Nudge Front x5", nudgeFront5);
-    controller.registerButton("Nudge Back x5", nudgeBack5);
+    controller.registerButton("Nudge Left x3", nudgeLeft3);
+    controller.registerButton("Nudge Right x3", nudgeRight3);
+    controller.registerButton("Nudge Front x3", nudgeFront3);
+    controller.registerButton("Nudge Back x3", nudgeBack3);
   
 }
 
