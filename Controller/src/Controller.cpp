@@ -287,23 +287,6 @@ bool Controller::extractQueryInt(const String& requestLine, const char* key, int
     return true;
 }
 
-void Controller::handleConfig(WiFiClient& client, const String& requestLine) {
-
-    int delayVal = timeDelayMs;
-    int pwmVal   = pwmValue;
-
-    extractQueryInt(requestLine, "delay", delayVal);
-    extractQueryInt(requestLine, "pwm", pwmVal);
-
-    delayVal = clampInt(delayVal, 100, 1000);
-    pwmVal   = clampInt(pwmVal, 0, 255);
-
-    timeDelayMs = delayVal;
-    pwmValue    = pwmVal;
-
-    sendHttpOk(client, "text/plain; charset=utf-8", "OK");
-}
-
 void Controller::handleClient(WiFiClient& client) {
     String requestLine = readRequestLine(client);
     if (requestLine.length() == 0) return;
@@ -329,6 +312,10 @@ void Controller::handleClient(WiFiClient& client) {
         handleBtn(client, requestLine);
         return;
     }
+    if (requestLine.startsWith("GET /sld?")) {
+        handleSlider(client, requestLine);
+        return;
+    }
 
     if (requestLine.startsWith("GET /control?msg=")) {
         handleControlMsg(client, requestLine);
@@ -339,11 +326,6 @@ void Controller::handleClient(WiFiClient& client) {
         handleHealth(client);
         return;
     }
-
-	if (requestLine.startsWith("GET /config?")) {
-		handleConfig(client, requestLine);
-		return;
-	}
 
     sendHttpNotFound(client);
 }
@@ -363,6 +345,29 @@ void Controller::handleControlMsg(WiFiClient& client, const String& requestLine)
     sendHttpOk(client, "text/plain; charset=utf-8", "OK");
 }
 
+bool Controller::registerSlider(const char* label, void (*cb)(int value),
+                                int minVal, int maxVal, int initial, int step) {
+    if (_sliderCount >= MAX_SLIDERS) return false;
+    if (minVal > maxVal) { int tmp = minVal; minVal = maxVal; maxVal = tmp; }
+    if (step <= 0) step = 1;
+
+    initial = clampInt(initial, minVal, maxVal);
+
+    _sliders[_sliderCount].label  = label;
+    _sliders[_sliderCount].minVal = minVal;
+    _sliders[_sliderCount].maxVal = maxVal;
+    _sliders[_sliderCount].step   = step;
+    _sliders[_sliderCount].value  = initial;
+    _sliders[_sliderCount].cb     = cb;
+
+    _sliderCount++;
+    return true;
+}
+
+void Controller::clearSliders() {
+    _sliderCount = 0;
+}
+
 void Controller::handleBtn(WiFiClient& client, const String& requestLine) {
     int id = -1;
     if (!extractQueryInt(requestLine, "id", id)) {
@@ -378,6 +383,36 @@ void Controller::handleBtn(WiFiClient& client, const String& requestLine) {
     if (_buttons[id].cb) _buttons[id].cb();
 
     if (_onMessage) _onMessage(String("btn:") + _buttons[id].label);
+
+    sendHttpOk(client, "text/plain; charset=utf-8", "OK");
+}
+void Controller::handleSlider(WiFiClient& client, const String& requestLine) {
+    int id = -1;
+    int v  = 0;
+
+    if (!extractQueryInt(requestLine, "id", id)) {
+        sendHttpOk(client, "text/plain; charset=utf-8", "Missing id");
+        return;
+    }
+    if (!extractQueryInt(requestLine, "v", v)) {
+        sendHttpOk(client, "text/plain; charset=utf-8", "Missing v");
+        return;
+    }
+
+    if (id < 0 || id >= (int)_sliderCount) {
+        sendHttpOk(client, "text/plain; charset=utf-8", "Bad id");
+        return;
+    }
+
+    // Clamp + store
+    v = clampInt(v, _sliders[id].minVal, _sliders[id].maxVal);
+    _sliders[id].value = v;
+
+    // Call callback
+    if (_sliders[id].cb) _sliders[id].cb(v);
+
+    // Optional message callback (consistent with buttons)
+    if (_onMessage) _onMessage(String("sld:") + _sliders[id].label + "=" + String(v));
 
     sendHttpOk(client, "text/plain; charset=utf-8", "OK");
 }
@@ -509,6 +544,35 @@ void Controller::handleRoot(WiFiClient& client) {
     if (_buttonCount == 0) {
         buttonsHtml = "<div style='opacity:.7'>No buttons registered</div>";
     }
+    String slidersHtml;
+    for (uint8_t i = 0; i < _sliderCount; i++) {
+        slidersHtml += "<div class='row sldRow'>";
+        slidersHtml += "  <div class='thrHeader'>";
+        slidersHtml += "    <div class='thrLabel'>";
+        slidersHtml += _sliders[i].label;
+        slidersHtml += "    </div>";
+        slidersHtml += "    <div class='thrValue'><span class='sldVal' data-id='";
+        slidersHtml += i;
+        slidersHtml += "'>";
+        slidersHtml += _sliders[i].value;
+        slidersHtml += "</span></div>";
+        slidersHtml += "  </div>";
+        slidersHtml += "  <input class='thr uSld' data-id='";
+        slidersHtml += i;
+        slidersHtml += "' type='range' min='";
+        slidersHtml += _sliders[i].minVal;
+        slidersHtml += "' max='";
+        slidersHtml += _sliders[i].maxVal;
+        slidersHtml += "' value='";
+        slidersHtml += _sliders[i].value;
+        slidersHtml += "' step='";
+        slidersHtml += _sliders[i].step;
+        slidersHtml += "'/>";
+        slidersHtml += "</div>";
+    }
+    if (_sliderCount == 0) {
+        slidersHtml = "<div class='row' style='opacity:.7'>No sliders registered</div>";
+    }
 
     String page;
     page.reserve(7500);
@@ -554,37 +618,23 @@ void Controller::handleRoot(WiFiClient& client) {
     page += buttonsHtml;
     page += "</div>";
 
+    page += "<div class='row' id='sliders'>";
+    page += slidersHtml;
+    page += "</div>";
+
     page += "<div class='row'><div id='joy'><div id='stick'></div></div></div>";
-	page += "<div class='row'><div id='status'></div></div>";
 
-page += "<div class='row' id='thrRow'>";
-page += "  <div class='thrHeader'>";
-page += "    <div class='thrLabel'>Throttle</div>";
-page += "    <div class='thrValue'><span id='tval'>100</span>%</div>";
-page += "  </div>";
-page += "  <input id='thr' class='thr' type='range' min='0' max='100' value='100' step='1'/>";
-page += "</div>";
-
-
-page += "<div class='row' id='timeRow'>";
-page += "  <div class='timeHeader'>";
-page += "    <div class='timeLabel'>Time Delay</div>";
-page += "    <div class='timeValue'><span id='timeval'>400</span>ms</div>";
-page += "  </div>";
-page += "  <input id='time' class='thr' type='range' min='100' max='1000' value='400' step='1'/>";
-page += "</div>";
-
-page += "<div class='row' id='pwmRow'>";
-page += "  <div class='pwmHeader'>";
-page += "    <div class='pwmLabel'>PWM</div>";
-page += "    <div class='pwmValue'><span id='pwmval'>255</span></div>";
-page += "  </div>";
-page += "  <input id='pwm' class='thr' type='range' min='1' max='255' value='255' step='1'/>";
-page += "</div>";
+    page += "<div class='row' id='thrRow'>";
+    page += "  <div class='thrHeader'>";
+    page += "    <div class='thrLabel'>Throttle</div>";
+    page += "    <div class='thrValue'><span id='tval'>5</span>%</div>";
+    page += "  </div>";
+    page += "  <input id='thr' class='thr' type='range' min='0' max='12' value='5' step='0.2'/>";
+    page += "</div>";
 
     // --- JS (STOP priority even if a request is in-flight) + HEARTBEAT resend ---
     page += "<script>";
-    page += "let x=0,y=0,t=100;";
+    page += "let x=0,y=0,t=5;";
     page += "const joy=document.getElementById('joy');";
     page += "const stick=document.getElementById('stick');";
     page += "const thr=document.getElementById('thr');";
@@ -601,6 +651,21 @@ page += "</div>";
     page += "    const id=b.getAttribute('data-id');";
     page += "    fetch(`/btn?id=${id}&_=${Date.now()}`, {cache:'no-store'}).catch(()=>{});";
     page += "    updateStatus('btn id=' + id);";
+    page += "  });";
+    page += "});";
+
+    // Dynamic sliders
+    // --- Dynamic sliders (add-on sliders like buttons) ---
+    page += "document.querySelectorAll('.uSld').forEach(s=>{";
+    page += "  const id = s.getAttribute('data-id');";
+    page += "  const vEl = document.querySelector(`.sldVal[data-id='${id}']`);";
+    page += "  function sendSlider(){";
+    page += "    const v = parseInt(s.value,10) || 0;";
+    page += "    if (vEl) vEl.textContent = v;";
+    page += "    fetch(`/sld?id=${id}&v=${v}&_=${Date.now()}`, {cache:'no-store'}).catch(()=>{});";
+    page += "  }";
+    page += "  s.addEventListener('input', ()=>{";
+    page += "    sendSlider();";
     page += "  });";
     page += "});";
 
@@ -692,30 +757,6 @@ page += "</div>";
     page += "  sendDriveNow(true);";
     page += "});";
 
-	page += "function sendConfig(){";
-	page += "  fetch(`/config?delay=${timeDelay}&pwm=${pwmValue}&_=${Date.now()}`,";
-	page += "        {cache:'no-store'}).catch(()=>{});";
-	page += "}";
-    page += "const timeSlider=document.getElementById('time');";
-    page += "const timeval=document.getElementById('timeval');";
-    page += "const pwmSlider=document.getElementById('pwm');";
-    page += "const pwmval=document.getElementById('pwmval');";
-
-    page += "let timeDelay=400;";
-    page += "let pwmValue=255;";
-
-    page += "timeSlider.addEventListener('input',()=>{";
-    page += "  timeDelay=parseInt(timeSlider.value,10)||300;";
-    page += "  timeval.textContent=timeDelay;";
-    page += "  sendConfig();";
-    page += "});";
-
-    page += "pwmSlider.addEventListener('input',()=>{";
-    page += "  pwmValue=parseInt(pwmSlider.value,10)||0;";
-    page += "  pwmval.textContent=pwmValue;";
-    page += "  sendConfig();";
-    page += "});";
-
     page += "updateStatus('ready');";
     page += "sendDriveNow(true);";
     page += "</script>";
@@ -736,6 +777,38 @@ void Controller::motorInitSafeStop() {
     digitalWrite(_in3, HIGH);
     digitalWrite(_in4, HIGH);
     analogWrite(_enb, 0);
+}
+
+void Controller::nudgeLeft(int nudgeThr, int nudgeDur) {
+
+    _cmdLeft  = -nudgeThr;
+    _cmdRight =  nudgeThr;
+
+    _lastDriveMs = millis();
+    _failsafeStopped = false;
+
+	applySmoothingAndNotify();
+    delay(nudgeDur);
+
+    _cmdLeft = 0;
+    _cmdRight = 0;
+	applySmoothingAndNotify();
+}
+
+void Controller::nudgeRight(int nudgeThr, int nudgeDur) {
+
+    _cmdLeft  =  nudgeThr;
+    _cmdRight = -nudgeThr;
+
+    _lastDriveMs = millis();
+    _failsafeStopped = false;
+
+	applySmoothingAndNotify();
+    delay(nudgeDur);
+
+    _cmdLeft = 0;
+    _cmdRight = 0;
+	applySmoothingAndNotify();
 }
 
 void Controller::speedToCmd(int8_t spd, bool &forward, uint8_t &pwm) {

@@ -10,8 +10,8 @@
 
 class Controller {
 public:
-	int timeDelayMs = 400;
-	int pwmValue = 255;
+	void nudgeLeft(int nudgeThr, int nudgeDur);
+	void nudgeRight(int nudgeThr, int nudgeDur);
     Controller(const char* ssid, const char* password);
 
     // Start AP + HTTP server (optional debug flag for prints)
@@ -35,6 +35,11 @@ public:
     bool registerButton(const char* label, void (*cb)());
     void clearButtons();
 
+	// NEW add on sliders-> callback receives value (and updates internal value too)
+	bool registerSlider(const char* label, void (*cb)(int value),
+                    int minVal = 0, int maxVal = 100, int initial = 0, int step = 1);
+	void clearSliders();
+
     // -------- L298N integration (optional) --------
     // Call this before beginAP() to let the library drive motors automatically.
     void configureL298N(
@@ -50,6 +55,7 @@ public:
 void setMotorMinPWM(uint8_t pwm);
 
 private:
+	void handleSlider(WiFiClient& client, const String& requestLine);
 
 enum LedState {
     LED_BOOTING,
@@ -66,7 +72,6 @@ enum LedState {
     void sendHttpOk(WiFiClient& client, const char* contentType, const String& body);
     void sendHttpNotFound(WiFiClient& client);
 
-	void handleConfig(WiFiClient& client, const String& requestLine);
     void handleRoot(WiFiClient& client);
     void handleDrive(WiFiClient& client, const String& requestLine);
     void handleBtn(WiFiClient& client, const String& requestLine);
@@ -148,6 +153,21 @@ private:
 
     ButtonReg _buttons[MAX_BUTTONS];
     uint8_t _buttonCount = 0;
+
+// Slider registry
+static constexpr uint8_t MAX_SLIDERS = 8;
+
+struct SliderReg {
+    String label;
+    int minVal = 0;
+    int maxVal = 100;
+    int step   = 1;
+    int value  = 0;              // stored current value
+    void (*cb)(int value) = nullptr;
+};
+
+SliderReg _sliders[MAX_SLIDERS];
+uint8_t _sliderCount = 0;
 
     // -------- L298N config --------
     bool _l298nEnabled = false;

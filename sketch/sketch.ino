@@ -5,18 +5,11 @@
 #define in1 3
 #define in2 2
 #define en 11  // pwm
-unsigned int arm_pwm = 255;
-unsigned int pulse_delay = 500;
+unsigned int arm_pwm;
+unsigned int pulse_delay;
 bool using_arm = true;
 std::vector<long double> w = {};
 
-void increase_pwm() {arm_pwm += 10;}
-
-void decrease_pwm() {arm_pwm -= 10;}
-
-void increase_delay() {pulse_delay+=25;}
-
-void decrease_delay() {pulse_delay-=25;}
 
 // long double distToTime(long double d) {
 //   long double ret = 0;
@@ -30,7 +23,7 @@ void decrease_delay() {pulse_delay-=25;}
 
 void armBrake() {
   digitalWrite(in1, HIGH);
-  digitalWrite(in2, HIGH);
+  digitalWrite(in2, HIGH);aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
   analogWrite(en, 0);
 }
 
@@ -62,12 +55,10 @@ void armReset() {
   unsigned int old = arm_pwm;
   arm_pwm = 80;
   enableForward();
-  delay(1250);
-  enableBackward();
-  delay(1250);
+  delay(700);
   armBrake();
   arm_pwm = old;
-}  unsigned int old = arm_pwm;
+}
 
 
 void pulseForward() {
@@ -84,7 +75,25 @@ void pulseBackward() {
   armReset();
 }
 
+void updatePwm(int val) {
+  arm_pwm = val;
+}
+
+void updateDelay(int val) {
+  pulse_delay = val;
+}
+
 Controller controller("NoahsArch", "SurvivedTheFlood");
+
+int nudgeThr = 40;
+int nudgeDur = 120;
+void nudgeLeft() {
+  controller.nudgeLeft(nudgeThr, nudgeDur);
+}
+
+void nudgeRight() {
+  controller.nudgeRight(nudgeThr, nudgeDur);
+}
 void setup() {
   // Movement control
   Serial.begin(115200);
@@ -104,18 +113,17 @@ void setup() {
     pinMode(en, OUTPUT);
 
     // Add buttons
-    controller.registerButton("Arm Forward", pulseForward);
-    controller.registerButton("Arm Backward", pulseBackward);
-    controller.registerButton("Arm Reset", armReset);
-    controller.registerButton("Arm PWM +10", increase_pwm);
-    controller.registerButton("Arm PWM -10", decrease_pwm);
-    controller.registerButton("Arm Delay +25", increase_delay);
-    controller.registerButton("Arm Delay -25", decrease_delay);
+    //controller.registerButton("Arm Forward", pulseForward);
+    controller.registerButton("SHOOT", pulseBackward);
+    controller.registerButton("Reset", armReset);
+    controller.registerSlider("Arm pwm", updatePwm, 30, 255, 255, 1);
+    controller.registerSlider("Pulse delay", updateDelay, 100, 1000, 400, 10);
   }
+    controller.registerButton("Nudge Left", nudgeLeft);
+    controller.registerButton("Nudge Right", nudgeRight);
+  
 }
 
 void loop() {
-  arm_pwm = controller.pwmValue;
-  pulse_delay = controller.timeDelayMs;
   controller.update();
 }
