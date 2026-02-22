@@ -5,8 +5,8 @@
 #define in1 3
 #define in2 2
 #define en 11  // pwm
-unsigned int arm_pwm = 210;
-unsigned int pulse_delay = 300;
+unsigned int arm_pwm = 255;
+unsigned int pulse_delay = 500;
 bool using_arm = true;
 std::vector<long double> w = {};
 
