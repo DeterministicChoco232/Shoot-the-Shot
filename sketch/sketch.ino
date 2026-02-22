@@ -87,17 +87,17 @@ Controller controller("NoahsArch", "SurvivedTheFlood");
 
 int nudgeThr = 40;
 int nudgeDur = 120;
+int punchThr = 120;
+int punchDur = 120;
 void nudgeLeft() {
   controller.nudgeLeft(nudgeThr, nudgeDur);
 }
-
 void nudgeRight() {
   controller.nudgeRight(nudgeThr, nudgeDur);
 }
 void nudgeFront() {
   controller.nudgeFront(nudgeThr, nudgeDur);
 }
-
 void nudgeBack() {
   controller.nudgeBack(nudgeThr, nudgeDur);
 }
@@ -118,6 +118,18 @@ void nudgeFront3() {
 void nudgeBack3() {
   for(int i=0; i<3; ++i)
   controller.nudgeBack(nudgeThr, nudgeDur);
+}
+void punchLeft() {
+  controller.nudgeLeft(punchThr, punchDur);
+}
+void punchRight() {
+  controller.nudgeRight(punchThr, punchDur);
+}
+void punchFront() {
+  controller.nudgeFront(punchThr, punchDur);
+}
+void punchBack() {
+  controller.nudgeBack(punchThr, punchDur);
 }
 void setup() {
   // Movement control
@@ -152,6 +164,10 @@ void setup() {
     controller.registerButton("Nudge Right x3", nudgeRight3);
     controller.registerButton("Nudge Front x3", nudgeFront3);
     controller.registerButton("Nudge Back x3", nudgeBack3);
+    controller.registerButton("Punch Left",  punchLeft);
+    controller.registerButton("Punch Right", punchRight);
+    controller.registerButton("Punch Front", punchFront);
+    controller.registerButton("Punch Back", punchBack);
   
 }
 

@@ -629,7 +629,7 @@ void Controller::handleRoot(WiFiClient& client) {
     page += "    <div class='thrLabel'>Throttle</div>";
     page += "    <div class='thrValue'><span id='tval'>10</span>%</div>";
     page += "  </div>";
-    page += "  <input id='thr' class='thr' type='range' min='7' max='20' value='10' step='1'/>";
+    page += "  <input id='thr' class='thr' type='range' min='7' max='100' value='10' step='1'/>";
     page += "</div>";
 
     // --- JS (STOP priority even if a request is in-flight) + HEARTBEAT resend ---
