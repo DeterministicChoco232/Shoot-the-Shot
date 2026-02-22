@@ -28,6 +28,7 @@ void decrease_delay() {pulse_delay-=25;}
 //   return ret;
 // }
 
+
 void armBrake() {
   digitalWrite(in1, HIGH);
   digitalWrite(in2, HIGH);
@@ -56,6 +57,15 @@ void enableBackward() {
   digitalWrite(in1, LOW);
   digitalWrite(in2, HIGH);
   analogWrite(en, arm_pwm);
+}
+
+
+void armReset() {
+  unsigned int old = arm_pwm;
+  arm_pwm = 30;
+  enableForward();
+  delay(1250);
+  armBrake();
 }
 
 void pulseForward() {
@@ -90,13 +100,13 @@ void setup() {
     pinMode(en, OUTPUT);
 
     // Add buttons
-    controller.registerButton("Forward", pulseForward);
-    controller.registerButton("Backward", pulseBackward);
-    controller.registerButton("Release", armRelease);
-    controller.registerButton("PWM +10", increase_pwm);
-    controller.registerButton("PWM -10", decrease_pwm);
-    controller.registerButton("Delay +25", increase_delay);
-    controller.registerButton("Delay -25", decrease_delay);
+    controller.registerButton("Arm Forward", pulseForward);
+    controller.registerButton("Arm Backward", pulseBackward);
+    controller.registerButton("Arm Reset", armReset);
+    controller.registerButton("Arm PWM +10", increase_pwm);
+    controller.registerButton("Arm PWM -10", decrease_pwm);
+    controller.registerButton("Arm Delay +25", increase_delay);
+    controller.registerButton("Arm Delay -25", decrease_delay);
   }
 }
 
