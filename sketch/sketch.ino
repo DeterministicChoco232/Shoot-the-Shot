@@ -23,7 +23,7 @@ std::vector<long double> w = {};
 
 void armBrake() {
   digitalWrite(in1, HIGH);
-  digitalWrite(in2, HIGH);aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  digitalWrite(in2, HIGH);
   analogWrite(en, 0);
 }
 
@@ -94,6 +94,13 @@ void nudgeLeft() {
 void nudgeRight() {
   controller.nudgeRight(nudgeThr, nudgeDur);
 }
+void nudgeFront() {
+  controller.nudgeFront(nudgeThr, nudgeDur);
+}
+
+void nudgeBack() {
+  controller.nudgeBack(nudgeThr, nudgeDur);
+}
 void setup() {
   // Movement control
   Serial.begin(115200);
@@ -121,6 +128,8 @@ void setup() {
   }
     controller.registerButton("Nudge Left", nudgeLeft);
     controller.registerButton("Nudge Right", nudgeRight);
+    controller.registerButton("Nudge Front", nudgeFront);
+    controller.registerButton("Nudge Back", nudgeBack);
   
 }
 

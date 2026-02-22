@@ -627,14 +627,14 @@ void Controller::handleRoot(WiFiClient& client) {
     page += "<div class='row' id='thrRow'>";
     page += "  <div class='thrHeader'>";
     page += "    <div class='thrLabel'>Throttle</div>";
-    page += "    <div class='thrValue'><span id='tval'>5</span>%</div>";
+    page += "    <div class='thrValue'><span id='tval'>10</span>%</div>";
     page += "  </div>";
-    page += "  <input id='thr' class='thr' type='range' min='0' max='12' value='5' step='0.2'/>";
+    page += "  <input id='thr' class='thr' type='range' min='7' max='20' value='10' step='1'/>";
     page += "</div>";
 
     // --- JS (STOP priority even if a request is in-flight) + HEARTBEAT resend ---
     page += "<script>";
-    page += "let x=0,y=0,t=5;";
+    page += "let x=0,y=0,t=10;";
     page += "const joy=document.getElementById('joy');";
     page += "const stick=document.getElementById('stick');";
     page += "const thr=document.getElementById('thr');";
@@ -805,6 +805,38 @@ void Controller::nudgeRight(int nudgeThr, int nudgeDur) {
 
 	applySmoothingAndNotify();
     delay(nudgeDur);
+
+    _cmdLeft = 0;
+    _cmdRight = 0;
+	applySmoothingAndNotify();
+}
+
+void Controller::nudgeFront(int nudgeThr, int nudgeDur) {
+
+    _cmdLeft  = nudgeThr;
+    _cmdRight =  nudgeThr;
+
+    _lastDriveMs = millis();
+    _failsafeStopped = false;
+
+	applySmoothingAndNotify();
+    delay(nudgeDur*3/4);
+
+    _cmdLeft = 0;
+    _cmdRight = 0;
+	applySmoothingAndNotify();
+}
+
+void Controller::nudgeBack(int nudgeThr, int nudgeDur) {
+
+    _cmdLeft  = -nudgeThr;
+    _cmdRight = -nudgeThr;
+
+    _lastDriveMs = millis();
+    _failsafeStopped = false;
+
+	applySmoothingAndNotify();
+    delay(nudgeDur*3/4);
 
     _cmdLeft = 0;
     _cmdRight = 0;

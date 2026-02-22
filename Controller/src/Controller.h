@@ -12,6 +12,8 @@ class Controller {
 public:
 	void nudgeLeft(int nudgeThr, int nudgeDur);
 	void nudgeRight(int nudgeThr, int nudgeDur);
+	void nudgeFront(int nudgeThr, int nudgeDur);
+	void nudgeBack(int nudgeThr, int nudgeDur);
     Controller(const char* ssid, const char* password);
 
     // Start AP + HTTP server (optional debug flag for prints)
