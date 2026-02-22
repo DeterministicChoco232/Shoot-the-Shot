@@ -295,7 +295,7 @@ void Controller::handleConfig(WiFiClient& client, const String& requestLine) {
     extractQueryInt(requestLine, "delay", delayVal);
     extractQueryInt(requestLine, "pwm", pwmVal);
 
-    delayVal = clampInt(delayVal, 100, 600);
+    delayVal = clampInt(delayVal, 100, 1000);
     pwmVal   = clampInt(pwmVal, 0, 255);
 
     timeDelayMs = delayVal;
@@ -569,9 +569,9 @@ page += "</div>";
 page += "<div class='row' id='timeRow'>";
 page += "  <div class='timeHeader'>";
 page += "    <div class='timeLabel'>Time Delay</div>";
-page += "    <div class='timeValue'><span id='timeval'>500</span>ms</div>";
+page += "    <div class='timeValue'><span id='timeval'>400</span>ms</div>";
 page += "  </div>";
-page += "  <input id='time' class='thr' type='range' min='100' max='600' value='500' step='1'/>";
+page += "  <input id='time' class='thr' type='range' min='100' max='1000' value='400' step='1'/>";
 page += "</div>";
 
 page += "<div class='row' id='pwmRow'>";
@@ -701,7 +701,7 @@ page += "</div>";
     page += "const pwmSlider=document.getElementById('pwm');";
     page += "const pwmval=document.getElementById('pwmval');";
 
-    page += "let timeDelay=500;";
+    page += "let timeDelay=400;";
     page += "let pwmValue=255;";
 
     page += "timeSlider.addEventListener('input',()=>{";

@@ -67,7 +67,8 @@ void armReset() {
   delay(1250);
   armBrake();
   arm_pwm = old;
-}
+}  unsigned int old = arm_pwm;
+
 
 void pulseForward() {
   enableForward();

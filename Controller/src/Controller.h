@@ -10,7 +10,7 @@
 
 class Controller {
 public:
-	int timeDelayMs = 500;
+	int timeDelayMs = 400;
 	int pwmValue = 255;
     Controller(const char* ssid, const char* password);
 
